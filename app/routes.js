@@ -1,4 +1,4 @@
-module.exports = function (app, passport) {
+module.exports = function (app) {
   
   const ytdl = require("ytdl-core");
   const ffmpeg = require("fluent-ffmpeg");
