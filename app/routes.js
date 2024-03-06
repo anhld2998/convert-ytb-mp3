@@ -1,5 +1,5 @@
 module.exports = function (app) {
-  const axios = require('axios');
+  
   const ytdl = require("ytdl-core");
   const ffmpeg = require("fluent-ffmpeg");
   const fs = require("fs");
@@ -9,38 +9,36 @@ module.exports = function (app) {
   app.get("/convert-mp3", (req, res) => {
     res.render("index");
   });
-  app.post("/convert-mp3", async (req, res) => {
+  app.post("/convert-mp3", function (req, res) {
     const youtubeUrl = req.body.youtubeUrl;
-    const postUrl = "https://www.y2mate.com/mates/convertV2/index";
-    try {
-        // Gửi yêu cầu POST đến API của y2mate.com
-        const response = await axios.post(postUrl, {
-            video_id: youtubeUrl,
-            ajax: "1",
-            bitrate: "128",
-            start: "1",
-            end: "999",
-            type: "youtube",
-           
-        });
+    const outputDirectory = "./static/mp3";
 
-        if (response.status === 200 && response.data.status === 'success') {
-            const fileUrl = response.data.link;
-            const filename = encodeURIComponent(response.data.title) + ".mp3";
-            const domainUrl = "http://localhost:8080/mp3/"; // Thay thế bằng đường dẫn thực của bạn
-            res.json({
-                success: true,
-                fileUrl: `${domainUrl}${filename}`,
-                filename: filename,
-            });
-        } else {
-            res.json({ success: false, error: "Lỗi khi chuyển đổi video sang mp3" });
-        }
-    } catch (error) {
-        console.error("Lỗi khi gửi yêu cầu chuyển đổi:", error.message);
-        res.json({ success: false, error: "Lỗi khi gửi yêu cầu chuyển đổi" });
-    }
-});
+    // Get the protocol (http or https) and hostname from the request object
+    const protocol = req.protocol;
+    const hostname = req.hostname || "localhost"; // Fallback to "localhost" if hostname is not available
+
+    // Define the fallback URL for localhost
+    const localhostUrl = "http://localhost:8080/mp3/";
+
+    // Construct the domain URL based on the protocol and hostname
+    const domainUrl =
+      hostname === "localhost"
+        ? localhostUrl
+        : `${protocol}://${hostname}/mp3/`;
+
+    downloadAndConvertToMp3(youtubeUrl, outputDirectory, (result) => {
+      if (result.success) {
+        const filename = encodeURIComponent(result.fileName); // Encode the filename
+        res.json({
+          success: true,
+          fileUrl: `${domainUrl}${filename}`,
+          filename: filename,
+        });
+      } else {
+        res.json({ success: false, error: result.error });
+      }
+    });
+  });
 
   async function downloadAndConvertToMp3(url, outputDir, callback) {
     try {
