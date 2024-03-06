@@ -54,9 +54,7 @@ module.exports = function (app) {
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
-
       ffmpeg.setFfmpegPath(require("ffmpeg-static"));
-
       ffmpeg(videoFormat.url)
         .audioBitrate(128)
         .on("end", () => {
