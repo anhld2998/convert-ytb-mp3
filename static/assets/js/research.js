@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
         videoCard.innerHTML = `
         <div class="card">
         <div class="row g-0">
-          <div class="col-auto">
-            <iframe src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
-          </div>
+        <div class="embed-responsive embed-responsive-16by9"> <!-- Thêm class embed-responsive để giữ tỷ lệ -->
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
+      </div>
           <div class="col">
             <div class="card-body">
               <h6 class="card-title mb-0 limit-lines">${video.snippet.title}</h6>
