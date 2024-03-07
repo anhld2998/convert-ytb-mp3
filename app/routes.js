@@ -1,84 +1,54 @@
 module.exports = function (app) {
-  
-  const ytdl = require("ytdl-core");
-  const ffmpeg = require("fluent-ffmpeg");
-  const fs = require("fs");
+  const { downloadAndConvertToMp3Middleware } = require('../middleware/mp3/convert-mp3'); // Adjust the path accordingly
+  const youtubeUtils = require('../middleware/research/main');
   app.get("/", (req, res) => {
     res.render("index");
   });
   app.get("/convert-mp3", (req, res) => {
     res.render("index");
   });
-  app.post("/convert-mp3", function (req, res) {
-    const youtubeUrl = req.body.youtubeUrl;
+  app.post("/convert-mp3", (req, res) => {
+    const { youtubeUrl } = req.body;
     const outputDirectory = "./static/mp3";
-
-    // Get the protocol (http or https) and hostname from the request object
     const protocol = req.protocol;
-    const hostname = req.hostname || "localhost"; // Fallback to "localhost" if hostname is not available
-
-    // Define the fallback URL for localhost
+    const hostname = req.hostname || "localhost";
     const localhostUrl = "http://localhost:8080/mp3/";
-
-    // Construct the domain URL based on the protocol and hostname
-    const domainUrl =
-      hostname === "localhost"
-        ? localhostUrl
-        : `${protocol}://${hostname}/mp3/`;
-
-    downloadAndConvertToMp3(youtubeUrl, outputDirectory, (result) => {
+    const domainUrl = hostname === "localhost" ? localhostUrl : `${protocol}://${hostname}/mp3/`;
+  
+    downloadAndConvertToMp3Middleware(youtubeUrl, outputDirectory, (result) => {
       if (result.success) {
-        const filename = encodeURIComponent(result.fileName); // Encode the filename
-        res.json({
-          success: true,
-          fileUrl: `${domainUrl}${filename}`,
-          filename: filename,
-        });
+        const filename = encodeURIComponent(result.fileName);
+        res.json({ success: true, fileUrl: `${domainUrl}${filename}`, filename });
       } else {
         res.json({ success: false, error: result.error });
       }
     });
   });
-
-  async function downloadAndConvertToMp3(url, outputDir, callback) {
+  app.get('/research-ytb', (req, res) => {
+    res.render('research')
+  })
+  const axios = require("axios");
+  app.get("/search", async (req, res) => {
     try {
-      const info = await ytdl.getInfo(url);
-      const videoFormat = ytdl.chooseFormat(info.formats, {
-        filter: "audioonly",
-      });
-
-      const fileName = sanitizeFilename(info.videoDetails.title) + ".mp3";
-
-      const outputFilePath = `${outputDir}/${fileName}`;
-
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-      }
-      ffmpeg.setFfmpegPath(require("ffmpeg-static"));
-      ffmpeg(videoFormat.url)
-        .audioBitrate(128)
-        .on("end", () => {
-          const result = { success: true, fileName: fileName };
-          console.log("Chuyển đổi hoàn thành!");
-          callback(result); // Call the callback function with the result
-        })
-        .on("error", (err) => {
-          const result = {
-            success: false,
-            error: "Lỗi khi chuyển đổi: " + err.message,
-          };
-          console.error(result.error);
-          callback(result); // Call the callback function with the error message
-        })
-        .save(outputFilePath);
-    } catch (err) {
-      const result = { success: false, error: "Lỗi: " + err.message };
-      console.error(result.error);
-      callback(result); // Call the callback function with the error message
+      const apiKey = "AIzaSyBAoy3B2-vJlVGscCQsb3Yr4EXrB59r9cQ";
+      const query = youtubeUtils.extractVideoId(req.query.q);
+      const response = await axios.get(
+        "https://www.googleapis.com/youtube/v3/search",
+        {
+          params: {
+            key: apiKey,
+            q: query,
+            part: "snippet",
+            type: "video",
+            maxResults: 10,
+          },
+        }
+      );
+      res.json(response.data);
+    } catch (error) {
+      console.error("Error fetching data from YouTube API:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-  }
+  });
 
-  function sanitizeFilename(filename) {
-    return filename.replace(/[<>:"\/\\|?*]/g, "");
-  }
 };
