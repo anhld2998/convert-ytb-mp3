@@ -4,15 +4,18 @@ module.exports = function (app) {
   app.get("/", (req, res) => {
     res.render("index");
   });
+  app.get("/dashboard", (req, res) => {
+    res.render("dashboard");
+  });
   app.get("/convert-mp3", (req, res) => {
     res.render("index");
   });
   app.post("/convert-mp3", (req, res) => {
     const { youtubeUrl } = req.body;
-    const outputDirectory = "./static/mp3";
+    const outputDirectory = "./public/mp3";
     const protocol = req.protocol;
     const hostname = req.hostname || "localhost";
-    const localhostUrl = "http://localhost:8080/mp3/";
+    const localhostUrl = `${process.env.URL_LOCAL}/mp3/`;
     const domainUrl = hostname === "localhost" ? localhostUrl : `${protocol}://${hostname}/mp3/`;
   
     downloadAndConvertToMp3Middleware(youtubeUrl, outputDirectory, (result) => {
@@ -30,10 +33,10 @@ module.exports = function (app) {
   const axios = require("axios");
   app.get("/search", async (req, res) => {
     try {
-      const apiKey = "AIzaSyBAoy3B2-vJlVGscCQsb3Yr4EXrB59r9cQ";
+      const apiKey = process.env.TOKEN_GOOGLE;
       const query = youtubeUtils.extractVideoId(req.query.q);
       const response = await axios.get(
-        "https://www.googleapis.com/youtube/v3/search",
+        process.env.URL_API_GOOGLE,
         {
           params: {
             key: apiKey,
