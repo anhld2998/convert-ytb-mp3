@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (query !== "") {
         search(query);
       }
-    }, 100);
+    }, 300);
   });
 
   function search(query) {
@@ -45,21 +45,23 @@ document.addEventListener("DOMContentLoaded", function () {
         videoCard.innerHTML = `
         <div class="card">
         <div class="row g-0">
-        <div class="embed-responsive embed-responsive-16by9"> <!-- Thêm class embed-responsive để giữ tỷ lệ -->
-        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
-      </div>
-          <div class="col">
-            <div class="card-body">
-              <h6 class="card-title mb-0 limit-lines">${video.snippet.title}</h6>
-              <div class="mt-2">
-                <a href="#" class="btn btn-sm btn-primary w-100">
-                  <i class="bi bi-file-earmark-music"></i> Convert MP3
-                </a>
-              </div>
+            <div class="col-md-6">
+                <div class="embed-responsive embed-responsive-16by9"> <!-- Thêm class embed-responsive để giữ tỷ lệ -->
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
+                </div>
             </div>
-          </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h6 style="max-height: 60px; overflow: hidden;" class="card-title mb-0 limit-lines">${video.snippet.title}</h6>
+                    <div class="mt-2">
+                        <a href="#" class="btn btn-sm btn-primary w-100">
+                            <i class="bi bi-file-earmark-music"></i> Convert MP3
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
               `;
 
         // Thêm card vào container hiện tại
