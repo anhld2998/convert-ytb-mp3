@@ -41,29 +41,28 @@ document.addEventListener("DOMContentLoaded", function () {
       videos.forEach((video, index) => {
         // Tạo card cho kết quả
         const videoCard = document.createElement("div");
-        videoCard.classList.add("col-md-6", "mb-4");
-        videoCard.innerHTML = `
-        <div class="card">
-        <div class="row g-0">
-            <div class="col-md-6">
-                <div class="embed-responsive embed-responsive-16by9"> <!-- Thêm class embed-responsive để giữ tỷ lệ -->
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
+        videoCard.classList.add("col-12 col-md-4", "mb-3");
+        videoCard.innerHTML = `  <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 d-flex align-items-stretch">
+                    <div class="embed-responsive embed-responsive-16by9">
+                      <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${video.id.videoId}" allowfullscreen></iframe>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card-body">
-                    <h6 style="max-height: 60px; overflow: hidden;" class="card-title mb-0 limit-lines">${video.snippet.title}</h6>
-                    <div class="mt-2">
-                        <a href="#" class="btn btn-sm btn-primary w-100">
-                            <i class="bi bi-file-earmark-music"></i> Convert MP3
-                        </a>
+                <div class="col-md-6">
+                    <div class="d-flex flex-column h-100">
+                        <h5 class="d-flex justify-content-start align-items-start card-title mb-0 limit-lines w-100">${video.snippet.title}</h5>
+                        <div class="mt-auto">
+                            <button class="btn btn-md btn-primary">
+                                Convert MP3
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-              `;
-
+    </div>`;
         // Thêm card vào container hiện tại
         searchResultsContainer.appendChild(videoCard);
       });

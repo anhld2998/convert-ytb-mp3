@@ -1,7 +1,11 @@
 
   /* Áp dụng border radius và màu sắc Neon Gray cho iframe */
   iframe {
+    bottom: 0;
     border-radius: 10px; /* Border radius cho iframe */
     filter: brightness(90%) saturate(120%); /* Tăng độ sáng và độ bão hòa màu sắc */
     max-width: 100%; /* Kích thước card nhỏ hơn cho iframe */
+  }
+  .embed-responsive-item{
+    height: 100% !important;
   }
