@@ -14,7 +14,6 @@ module.exports = function (app) {
     const hostname = req.hostname || "localhost";
     const localhostUrl = `${process.env.URL_LOCAL}/mp3/`;
     const domainUrl = hostname === "localhost" ? localhostUrl : `${protocol}://${hostname}/mp3/`;
-  
     downloadAndConvertToMp3Middleware(youtubeUrl, outputDirectory, (result) => {
       if (result.success) {
         const filename = encodeURIComponent(result.fileName);
