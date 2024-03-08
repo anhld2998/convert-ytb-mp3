@@ -1,7 +1,6 @@
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 const ffmpeg = require("fluent-ffmpeg");
-const { PassThrough } = require('stream');
 const { promisify } = require('util');
 
 const mkdirAsync = promisify(fs.mkdir);
@@ -11,8 +10,9 @@ module.exports = {
     try {
       const info = await ytdl.getInfo(url);
 
+      // Chọn định dạng có chất lượng cao hơn nếu có sẵn
       const videoFormat = ytdl.chooseFormat(info.formats, {
-        quality: 'lowestaudio',
+        quality: 'highestaudio',
         filter: 'audioonly'
       });
 
@@ -21,31 +21,28 @@ module.exports = {
 
       await mkdirAsync(outputDir, { recursive: true });
 
-      const passthroughStream = new PassThrough();
-
       const ffmpegPath = require("ffmpeg-static");
       if (!fs.existsSync(ffmpegPath)) {
-        throw new Error("FFmpeg not found at the specified path");
+        throw new Error("Không tìm thấy FFmpeg tại đường dẫn đã chỉ định");
       }
 
       ffmpeg.setFfmpegPath(ffmpegPath);
 
-      const ffmpegProcess = ffmpeg(passthroughStream)
+      // Sử dụng FFmpeg trực tiếp để tải xuống và chuyển đổi video sang MP3
+      ffmpeg(ytdl(url, { format: videoFormat }))
         .audioBitrate(128)
         .on("end", () => {
           callback({ success: true, fileName }); 
         })
         .on("error", (err) => {
-          console.error("Conversion Error:", err.message);
-          callback({ success: false, error: "Conversion Error: " + err.message }); 
+          console.error("Lỗi chuyển đổi:", err.message);
+          callback({ success: false, error: "Lỗi chuyển đổi: " + err.message }); 
         })
         .save(outputFilePath);
 
-      ytdl(url, { format: videoFormat }).pipe(passthroughStream);
-
     } catch (err) {
-      console.error("Error:", err.message);
-      callback({ success: false, error: "Error: " + err.message }); 
+      console.error("Lỗi:", err.message);
+      callback({ success: false, error: "Lỗi: " + err.message }); 
     }
   }
 };
