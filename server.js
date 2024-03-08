@@ -9,7 +9,7 @@ var port     = process.env.PORT;
 var mongoose = require('mongoose');
 var flash    = require('connect-flash');
 const compression = require('compression');
-
+const cache = require('memory-cache');
 var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
@@ -32,6 +32,26 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+const cacheMiddleware = (duration) => {
+    return (req, res, next) => {
+        const key = '__express__' + req.originalUrl || req.url;
+        const cachedBody = cache.get(key);
+        if (cachedBody) {
+            res.send(cachedBody);
+            return;
+        } else {
+            res.sendResponse = res.send;
+            res.send = (body) => {
+                cache.put(key, body, duration * 1000);
+                res.sendResponse(body);
+            };
+            next();
+        }
+    };
+};
+
+// Áp dụng compression và caching middleware cho tất cả các route
+app.use(cacheMiddleware(10));
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // routes ======================================================================
