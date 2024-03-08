@@ -84,25 +84,23 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </button>
                             </div>
                             <div class="modal-body" id="modal-body-${video.id.videoId}">
-                                <!-- Add loader or conversion progress here -->
-                                <div class="loader-wrapper">
-                                <div class="loader-index"><span></span></div>
-                                <svg>
-                                  <defs></defs>
-                                  <filter id="goo">
-                                    <fegaussianblur
-                                      in="SourceGraphic"
-                                      stddeviation="11"
-                                      result="blur"
-                                    ></fegaussianblur>
-                                    <fecolormatrix
-                                      in="blur"
-                                      values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
-                                      result="goo"
-                                    ></fecolormatrix>
-                                  </filter>
-                                </svg>
-                              </div>
+                            <div class="text-center">
+                            <img
+                              style="border-radius: 50%; margin-bottom: 10%"
+                              src="template/assets/images/logo/logo-icon.png"
+                              alt="Logo"
+                              width="100"
+                              height="100"
+                            />
+                          </div>
+                          <div class="text-center">
+                            <div class="spinner-border" role="status">
+                              <span class="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+                          <div class="text-center mt-3">
+                            <p>Please wait while processing...</p>
+                          </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -120,60 +118,45 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 function openModal(videoId, title) {
-    const modalBody = document.getElementById("modal-body");
-  
-    // Clear previous content and show loading indicator
-    modalBody.innerHTML = `
-      <div class="text-center">
-        <img
-          style="border-radius: 50%; margin-bottom: 10%"
-          src="template/assets/images/logo/logo-icon.png"
-          alt="Logo"
-          width="100"
-          height="100"
-        />
-      </div>
-      <div class="text-center">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-      <div class="text-center mt-3">
-        <p>Please wait while processing...</p>
-      </div>`;
-  
-    // Make an AJAX request to your server to convert the video to MP3
-    fetch("/convert-mp3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ youtubeUrl: videoId }),
+  const modalBody = document.getElementById("modal-body");
+
+  // Show the modal
+  const modal = document.getElementById("myModal");
+  modal.style.display = "block";
+
+  // Make an AJAX request to your server to convert the video to MP3
+  fetch("/convert-mp3", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ youtubeUrl: videoId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const downloadLink = document.createElement("a");
+        downloadLink.setAttribute("href", data.fileUrl);
+        downloadLink.setAttribute("download", `${title}.mp3`);
+        downloadLink.setAttribute("class", "btn btn-sm btn-primary");
+        downloadLink.textContent = "Download";
+        modalBody.innerHTML = ""; // Clear default content
+
+        // Attach click event listener to initiate download
+        downloadLink.addEventListener("click", () => {
+          // Trigger click event to initiate download
+          downloadLink.click();
+        });
+
+        modalBody.appendChild(downloadLink);
+      } else {
+        // If conversion fails, display an error message
+        modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          const downloadLink = document.createElement("a");
-          downloadLink.setAttribute("href", data.fileUrl);
-          downloadLink.setAttribute("download", `${title}.mp3`);
-          downloadLink.setAttribute("class", "btn btn-sm btn-primary");
-          downloadLink.textContent = "Download";
-          modalBody.innerHTML = ""; // Clear loading indicator
-  
-          // Attach click event listener to initiate download
-          downloadLink.addEventListener("click", () => {
-            // Trigger click event to initiate download
-            downloadLink.click();
-          });
-  
-          modalBody.appendChild(downloadLink);
-        } else {
-          // If conversion fails, display an error message
-          modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        modalBody.innerHTML = "<p>An error occurred while converting the video.</p>";
-      });
-  }
+    .catch((error) => {
+      console.error("Error:", error);
+      modalBody.innerHTML =
+        "<p>An error occurred while converting the video.</p>";
+    });
+}
