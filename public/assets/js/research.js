@@ -120,63 +120,60 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 function openModal(videoId, title) {
-  // Get the modal body element
-  const modalBody = document.getElementById("modal-body-" + videoId);
-
-  // Clear previous content and show loading indicator
-  modalBody.innerHTML = `<div class="text-center">
-    <img
-      style="border-radius: 50%; margin-bottom: 10%"
-      src="template/assets/images/logo/logo.png"
-      alt="Logo"
-      width="100"
-      height="100"
-    />
-  </div>
-  <div class="text-center">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-  <div class="text-center mt-3">
-    <p>Please wait while processing...</p>
-  </div>`;
-
-  // Make an AJAX request to your server to convert the video to MP3
-  fetch("/convert-mp3", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ youtubeUrl: videoId }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // If conversion is successful, display a success message and enable the download button
-        const downloadLink = document.createElement("a");
-        downloadLink.setAttribute("href", data.fileUrl);
-        downloadLink.setAttribute("download", `${title}.mp3`);
-        downloadLink.setAttribute("class", "btn btn-sm btn-primary");
-        downloadLink.textContent = "Download";
-        modalBody.innerHTML = ""; // Clear loading indicator
-
-        // Attach click event listener to initiate download
-        downloadLink.addEventListener("click", () => {
-          // Trigger click event to initiate download
-          downloadLink.click();
-        });
-
-        modalBody.appendChild(downloadLink);
-      } else {
-        // If conversion fails, display an error message
-        modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
-      }
+    const modalBody = document.getElementById("modal-body");
+  
+    // Clear previous content and show loading indicator
+    modalBody.innerHTML = `
+      <div class="text-center">
+        <img
+          style="border-radius: 50%; margin-bottom: 10%"
+          src="template/assets/images/logo/logo-icon.png"
+          alt="Logo"
+          width="100"
+          height="100"
+        />
+      </div>
+      <div class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div class="text-center mt-3">
+        <p>Please wait while processing...</p>
+      </div>`;
+  
+    // Make an AJAX request to your server to convert the video to MP3
+    fetch("/convert-mp3", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ youtubeUrl: videoId }),
     })
-    .catch((error) => {
-      // If an error occurs during the AJAX request, display an error message
-      console.error("Error:", error);
-      modalBody.innerHTML =
-        "<p>An error occurred while converting the video.</p>";
-    });
-}
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const downloadLink = document.createElement("a");
+          downloadLink.setAttribute("href", data.fileUrl);
+          downloadLink.setAttribute("download", `${title}.mp3`);
+          downloadLink.setAttribute("class", "btn btn-sm btn-primary");
+          downloadLink.textContent = "Download";
+          modalBody.innerHTML = ""; // Clear loading indicator
+  
+          // Attach click event listener to initiate download
+          downloadLink.addEventListener("click", () => {
+            // Trigger click event to initiate download
+            downloadLink.click();
+          });
+  
+          modalBody.appendChild(downloadLink);
+        } else {
+          // If conversion fails, display an error message
+          modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        modalBody.innerHTML = "<p>An error occurred while converting the video.</p>";
+      });
+  }
