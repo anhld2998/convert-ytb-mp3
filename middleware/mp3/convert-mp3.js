@@ -12,7 +12,7 @@ module.exports = {
       const info = await ytdl.getInfo(url);
 
       const videoFormat = ytdl.chooseFormat(info.formats, {
-        quality: 'highestaudio',
+        quality: 'lowestaudio',
         filter: 'audioonly'
       });
 
