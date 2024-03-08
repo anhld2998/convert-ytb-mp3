@@ -68,8 +68,8 @@
   <div class="page-wrapper compact-wrapper" id="pageWrapper">
     <!-- Page Header Start-->
     <div class="page-header">
-      <div class="header-wrapper row m-0">
-        <div class="header-logo-wrapper col-auto p-0">
+      <div class="header-wrapper d-flex">
+        <div class="header-logo-wrapper h-100">
           <div class="logo-wrapper">
             <a href="/dashboard"><img class="img-fluid" src="template/assets/images/logo/logo.png" alt="" /></a>
           </div>
@@ -77,9 +77,9 @@
             <i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
           </div>
         </div>
-        <div class="search-container nav-right col-auto p-0 d-flex">
-          <form id="search-form" class="d-flex justify-content-center needs-validation custom-input">
-            <input id="search-input" type="text" class="form-control" placeholder="Enter search query..." />
+        <div class="search-container nav-right d-flex w-100">
+          <form id="search-form" class="d-flex justify-content-center needs-validation custom-input h-100 w-100">
+            <input id="search-input" type="text" class="form-control" placeholder="Nhập từ khóa tìm kiếm..." />
           </form>
           <ul class="nav-menus">
             <li>
@@ -91,33 +91,7 @@
             </li>
           </ul>
         </div>
-        <script class="result-template" type="text/x-handlebars-template">
-            <div class="ProfileCard u-cf">
-              <div class="ProfileCard-avatar"><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="feather feather-airplay m-0"
-                ><path
-                    d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"
-                  ></path><polygon
-                    points="12 15 17 21 7 21 12 15"
-                  ></polygon></svg></div>
-              <div class="ProfileCard-details">
-                <div class="ProfileCard-realName">{{name}}</div>
-              </div>
-            </div>
-          </script>
-        <script class="empty-template" type="text/x-handlebars-template">
-            <div class="EmptyMessage">Your search turned up 0 results. This most
-              likely means the backend is down, yikes!</div>
-          </script>
+       
       </div>
     </div>
 
@@ -129,8 +103,7 @@
                 alt="" /><img class="img-fluid for-dark" src="template/assets/images/logo/logo_dark.png" alt="" /></a>
             <div class="back-btn"><i class="fa fa-angle-left"></i></div>
             <div class="toggle-sidebar">
-              <i class="status_toggle middle sidebar-toggle" data-feather="grid">
-              </i>
+              <i class="fa fa-home fs-5" data-feather="align-center"></i>
             </div>
           </div>
           <div class="logo-icon-wrapper">
@@ -160,24 +133,11 @@
                   </div>
                 </li>
 
-                <li class="sidebar-list">
-                  <i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="#">
-                    <svg class="stroke-icon">
-                      <use href="template/assets/svg/icon-sprite.svg#stroke-widget"></use>
-                    </svg>
-                    <svg class="fill-icon">
-                      <use href="template/assets/svg/icon-sprite.svg#fill-widget"></use>
-                    </svg><span class="lan-6">Widgets</span></a>
-                  <ul class="sidebar-submenu">
-                    <li><a href="general-widget.html">General</a></li>
-                    <li><a href="chart-widget.html">Chart</a></li>
-                  </ul>
-                </li>
+                <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a style="text-decoration: none;" class="sidebar-link sidebar-title link-nav" href="">
+                 <span class="d-flex justify-content-start align-items-center"><i class="fa fa-youtube-play fs-5 px-1"></i> Convert MP3</span><div class="according-menu"><i class="fa fa-angle-right"></i></div></a></li>
               </ul>
             </div>
-            <div class="right-arrow" id="right-arrow">
-              <i data-feather="arrow-right"></i>
-            </div>
+           
           </nav>
         </div>
       </div>

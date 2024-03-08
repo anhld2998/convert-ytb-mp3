@@ -1,32 +1,31 @@
 $(document).ready(function () {
-  const searchForm = $("#search-form");
-  const searchInput = $("#search-input");
-  const searchResults = $("#search-results");
-  let debounceTimeout;
-
-  searchForm.on("submit", function (event) {
-    event.preventDefault();
-    const query = searchInput.val().trim();
-    if (query !== "") {
-      search(query);
-    }
-  });
-
-  let lastQuery = "";
-
-    searchInput.on("input", function () {
-    clearTimeout(debounceTimeout);
-
-    debounceTimeout = requestAnimationFrame(() => {
-        const query = searchInput.val().trim();
-
-        if (query !== lastQuery && query.length >= 2) {  // Kiểm tra độ dài tối thiểu
-        lastQuery = query;
-        search(query);  // Tìm kiếm chỉ khi truy vấn đáp ứng tiêu chí
-        } else {
-        searchResults.html(""); 
-        }
+    const searchForm = $("#search-form");
+    const searchInput = $("#search-input");
+    const searchResults = $("#search-results");
+    let debounceTimeout;
+    let lastQuery = "";
+    
+    searchForm.on("submit", function (event) {
+      event.preventDefault();
+      const query = searchInput.val().trim();
+      if (query !== "") {
+        search(query);
+      }
     });
+    
+    searchInput.on("input", function () {
+      clearTimeout(debounceTimeout);
+    
+      debounceTimeout = setTimeout(() => {
+        const query = searchInput.val().trim();
+    
+        if (query !== lastQuery && query.length >= 2) {
+          lastQuery = query;
+          search(query);
+        } else {
+          searchResults.html("");
+        }
+      }, 300); // Thời gian chờ 500ms trước khi gửi truy vấn
     });
 
   function search(query) {
@@ -128,49 +127,47 @@ $(document).ready(function () {
 
 // Function to open modal
 function openModal(videoId, title) {
-    const modalBody = $(`#modal-body-${videoId}`);
-    const modal = $(`#exampleModal-${videoId}`);
-  
-    // Show the modal
-    modal.modal("show");
-  
-    // Make an AJAX request to your server to convert the video to MP3
-    $.post("/convert-mp3", { youtubeUrl: videoId })
-      .done(function (data) {
-        if (data.success) {
-          const downloadLink = $("<a>")
-            .attr("href", data.fileUrl)
-            .attr("download", `${title}.mp3`)
-            .attr("target", "_blank") 
-            .addClass("btn btn-sm btn-primary w-100")
-            .text("Download");
-  
-          const titleElement = $("<h5>")
-            .addClass("modal-title")
-            .text(title);
-  
-          const titleContainer = $("<div>")
-            .addClass("text-center title-container mt-2")
-            .append(titleElement);
-  
-          modalBody.empty(); // Clear default content
-  
-          downloadLink.on("click", function () {
-            downloadLink.get(0).click(); // Trigger click event to initiate download
-          });
-  
-          modalBody.append(titleContainer); // Add title container
-          modalBody.append(downloadLink); // Add download link
-        } else {
-          modalBody.html(`<p>Conversion failed: ${data.error}</p>`);
-        }
-      })
-      .fail(function (error) {
-        console.error("Error:", error);
-        modalBody.html("<p>An error occurred while converting the video.</p>");
-      });
-  }
-  
+  const modalBody = $(`#modal-body-${videoId}`);
+  const modal = $(`#exampleModal-${videoId}`);
+
+  // Show the modal
+  modal.modal("show");
+
+  // Make an AJAX request to your server to convert the video to MP3
+  $.post("/convert-mp3", { youtubeUrl: videoId })
+    .done(function (data) {
+      if (data.success) {
+        const downloadLink = $("<a>")
+          .attr("href", data.fileUrl)
+          .attr("download", `${title}.mp3`)
+          .attr("target", "_blank")
+          .addClass("btn btn-sm btn-primary w-100")
+          .text("Download");
+
+        const titleElement = $("<h5>").addClass("modal-title").text(title);
+
+        const titleContainer = $("<div>")
+          .addClass("text-center title-container mt-2")
+          .append(titleElement);
+
+        modalBody.empty(); // Clear default content
+
+        downloadLink.on("click", function () {
+          downloadLink.get(0).click(); // Trigger click event to initiate download
+        });
+
+        modalBody.append(titleContainer); // Add title container
+        modalBody.append(downloadLink); // Add download link
+      } else {
+        modalBody.html(`<p>Conversion failed: ${data.error}</p>`);
+      }
+    })
+    .fail(function (error) {
+      console.error("Error:", error);
+      modalBody.html("<p>An error occurred while converting the video.</p>");
+    });
+}
+
 // Function to close modal
 function closeModal(videoId) {
   const modal = $(`#exampleModal-${videoId}`);
