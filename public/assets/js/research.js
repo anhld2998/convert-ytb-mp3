@@ -40,11 +40,11 @@ document.addEventListener("DOMContentLoaded", function () {
     searchResultsContainer.innerHTML = "";
 
     if (videos && videos.length > 0) {
-        videos.forEach((video, index) => {
-            // Create card for each result
-            const videoCard = document.createElement("div");
-            videoCard.classList.add("col-md-6", "col-12", "mb-3");
-            videoCard.innerHTML = `
+      videos.forEach((video, index) => {
+        // Create card for each result
+        const videoCard = document.createElement("div");
+        videoCard.classList.add("col-md-6", "col-12", "mb-3");
+        videoCard.innerHTML = `
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -69,11 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             `;
 
-            // Append card to the current container
-            searchResultsContainer.appendChild(videoCard);
+        // Append card to the current container
+        searchResultsContainer.appendChild(videoCard);
 
-            // Modal HTML for each video
-            const modalHTML = `
+        // Modal HTML for each video
+        const modalHTML = `
                 <div class="modal fade" id="exampleModal${index}" tabindex="-1" aria-labelledby="exampleModalLabel${index}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -85,6 +85,24 @@ document.addEventListener("DOMContentLoaded", function () {
                             </div>
                             <div class="modal-body" id="modal-body-${video.id.videoId}">
                                 <!-- Add loader or conversion progress here -->
+                                <div class="loader-wrapper">
+                                <div class="loader-index"><span></span></div>
+                                <svg>
+                                  <defs></defs>
+                                  <filter id="goo">
+                                    <fegaussianblur
+                                      in="SourceGraphic"
+                                      stddeviation="11"
+                                      result="blur"
+                                    ></fegaussianblur>
+                                    <fecolormatrix
+                                      in="blur"
+                                      values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+                                      result="goo"
+                                    ></fecolormatrix>
+                                  </filter>
+                                </svg>
+                              </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -93,57 +111,72 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
             `;
-            // Append modal HTML to body
-            document.body.insertAdjacentHTML("beforeend", modalHTML);
-        });
+        // Append modal HTML to body
+        document.body.insertAdjacentHTML("beforeend", modalHTML);
+      });
     } else {
-        searchResultsContainer.innerHTML = "<p>No videos found.</p>";
+      searchResultsContainer.innerHTML = "<p>No videos found.</p>";
     }
-}
+  }
 });
 function openModal(videoId, title) {
-    // Get the modal body element
-    const modalBody = document.getElementById("modal-body-" + videoId);
-    
-    // Clear previous content and show loading indicator
-    modalBody.innerHTML = "<p>Loading...</p>";
-  
-    // Make an AJAX request to your server to convert the video to MP3
-    fetch("/convert-mp3", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ youtubeUrl: videoId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          // If conversion is successful, display a success message and enable the download button
-          const downloadLink = document.createElement('a');
-          downloadLink.setAttribute('href', data.fileUrl);
-          downloadLink.setAttribute('download', `${title}.mp3`);
-          downloadLink.setAttribute('class', 'btn btn-sm btn-primary');
-          downloadLink.textContent = 'Download';
-          modalBody.innerHTML = ''; // Clear loading indicator
-          
-          // Attach click event listener to initiate download
-          downloadLink.addEventListener('click', () => {
-            // Trigger click event to initiate download
-            downloadLink.click();
-          });
-          
-          modalBody.appendChild(downloadLink);
-        } else {
-          // If conversion fails, display an error message
-          modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
-        }
-      })
-      .catch((error) => {
-        // If an error occurs during the AJAX request, display an error message
-        console.error("Error:", error);
-        modalBody.innerHTML = "<p>An error occurred while converting the video.</p>";
-      });
-}
+  // Get the modal body element
+  const modalBody = document.getElementById("modal-body-" + videoId);
 
-  
+  // Clear previous content and show loading indicator
+  modalBody.innerHTML = `<div class="text-center">
+    <img
+      style="border-radius: 50%; margin-bottom: 10%"
+      src="template/assets/images/logo/logo.png"
+      alt="Logo"
+      width="100"
+      height="100"
+    />
+  </div>
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <div class="text-center mt-3">
+    <p>Please wait while processing...</p>
+  </div>`;
+
+  // Make an AJAX request to your server to convert the video to MP3
+  fetch("/convert-mp3", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ youtubeUrl: videoId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // If conversion is successful, display a success message and enable the download button
+        const downloadLink = document.createElement("a");
+        downloadLink.setAttribute("href", data.fileUrl);
+        downloadLink.setAttribute("download", `${title}.mp3`);
+        downloadLink.setAttribute("class", "btn btn-sm btn-primary");
+        downloadLink.textContent = "Download";
+        modalBody.innerHTML = ""; // Clear loading indicator
+
+        // Attach click event listener to initiate download
+        downloadLink.addEventListener("click", () => {
+          // Trigger click event to initiate download
+          downloadLink.click();
+        });
+
+        modalBody.appendChild(downloadLink);
+      } else {
+        // If conversion fails, display an error message
+        modalBody.innerHTML = `<p>Conversion failed: ${data.error}</p>`;
+      }
+    })
+    .catch((error) => {
+      // If an error occurs during the AJAX request, display an error message
+      console.error("Error:", error);
+      modalBody.innerHTML =
+        "<p>An error occurred while converting the video.</p>";
+    });
+}
