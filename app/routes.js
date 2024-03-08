@@ -2,9 +2,6 @@ module.exports = function (app) {
   const { downloadAndConvertToMp3Middleware } = require('../middleware/mp3/convert-mp3'); // Adjust the path accordingly
   const youtubeUtils = require('../middleware/research/main');
   app.get("/", (req, res) => {
-    res.render("index");
-  });
-  app.get("/dashboard", (req, res) => {
     res.render("dashboard");
   });
   app.get("/convert-mp3", (req, res) => {
