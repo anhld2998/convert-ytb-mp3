@@ -20,11 +20,12 @@ module.exports = {
         throw new Error("Không tìm thấy FFmpeg tại đường dẫn đã chỉ định");
       }
       ffmpeg.setFfmpegPath(ffmpegPath);
-      // Sử dụng stream để tải và chuyển đổi video thành MP3
-      const stream = ytdl(url, { format: 'mp4' })
+      
+      // Sử dụng stream audio để chuyển đổi trực tiếp sang MP3
+      const stream = ytdl(url, { filter: 'audioonly' }) // Thay đổi định dạng ở đây
         .on('error', (err) => {
-          console.error("Lỗi tải xuống video:", err.message);
-          callback({ success: false, error: "Lỗi tải xuống video: " + err.message });
+          console.error("Lỗi tải xuống audio:", err.message);
+          callback({ success: false, error: "Lỗi tải xuống audio: " + err.message });
         });
       ffmpeg(stream)
         .audioBitrate(128)
