@@ -2,9 +2,7 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const ffmpeg = require("fluent-ffmpeg");
 const { promisify } = require('util');
-
 const mkdirAsync = promisify(fs.mkdir);
-
 module.exports = {
   downloadAndConvertToMp3Middleware: async function (url, outputDir, callback) {
     try {
