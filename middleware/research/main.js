@@ -1,18 +1,19 @@
 module.exports = {
-    extractVideoId: function(input) {
-        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-        let output;
-      
-        // Check if the input matches the URL pattern
-        if (input.match(regex)) {
-          // Extract the video ID from the URL
-          const match = input.match(regex);
-          output = match[1];
-        } else {
-          // If it's not a URL, assume it's text
-          output = input;
-        }
-      
-        return output;
-      }
+  // Hàm này nhận đầu vào là một URL YouTube hoặc ID video và trích xuất ID video
+  extractVideoId: function(input) {
+    const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    let output;
+
+    // Kiểm tra xem đầu vào có khớp với mẫu URL không
+    if (input.match(regex)) {
+      // Trích xuất ID video từ URL
+      const match = input.match(regex);
+      output = match[1];
+    } else {
+      // Nếu không phải là URL, giả định đó là văn bản
+      output = input;
+    }
+
+    return output;
+  }
 };
