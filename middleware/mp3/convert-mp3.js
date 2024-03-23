@@ -3,39 +3,37 @@ const ytdl = require("ytdl-core");
 const ffmpeg = require("fluent-ffmpeg");
 const { promisify } = require('util');
 const mkdirAsync = promisify(fs.mkdir);
+const ffmpegPath = require("ffmpeg-static");
+
 module.exports = {
   downloadAndConvertToMp3Middleware: async function (url, outputDir, callback) {
     try {
-      const info = await ytdl.getInfo(url, { quality: 'highestaudio', filter: 'audioonly' });
+      await mkdirAsync(outputDir, { recursive: true });
+
+      const info = await ytdl.getInfo(url);
 
       const fileName = `${info.videoDetails.title.replace(/[<>:"/\\|?*]/g, "")}.mp3`;
       const outputFilePath = `${outputDir}/${fileName}`;
 
-      await mkdirAsync(outputDir, { recursive: true });
-
-      const ffmpegPath = require("ffmpeg-static");
-      if (!fs.existsSync(ffmpegPath)) {
-        throw new Error("Không tìm thấy FFmpeg tại đường dẫn đã chỉ định");
-      }
       ffmpeg.setFfmpegPath(ffmpegPath);
-      
-      // Sử dụng stream audio để chuyển đổi trực tiếp sang MP3
-      const stream = ytdl(url, { filter: 'audioonly' }) // Thay đổi định dạng ở đây
+
+      const stream = ytdl(url, { quality: 'lowestaudio', filter: 'audioonly' })
         .on('error', (err) => {
           console.error("Lỗi tải xuống audio:", err.message);
           callback({ success: false, error: "Lỗi tải xuống audio: " + err.message });
         });
+
       ffmpeg(stream)
         .audioBitrate(128)
-        .save(outputFilePath)
-        .on('end', () => {
-          callback({ success: true, fileName });
-        })
+        .outputOptions('-vn') // chỉ định output là audio only
         .on('error', (err) => {
           console.error("Lỗi chuyển đổi:", err.message);
           callback({ success: false, error: "Lỗi chuyển đổi: " + err.message });
-        });
-
+        })
+        .on('end', () => {
+          callback({ success: true, fileName });
+        })
+        .save(outputFilePath);
     } catch (err) {
       console.error("Lỗi:", err.message);
       callback({ success: false, error: "Lỗi: " + err.message });

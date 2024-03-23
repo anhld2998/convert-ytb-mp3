@@ -5,7 +5,7 @@
 var express  = require('express');
 require('dotenv').config();
 var app      = express();
-var port     = process.env.PORT;
+var port     = process.env.PORT || 8000;
 var mongoose = require('mongoose');
 var flash    = require('connect-flash');
 const compression = require('compression');
@@ -49,7 +49,10 @@ const cacheMiddleware = (duration) => {
         }
     };
 };
+//  config redis
 
+
+// 
 // Áp dụng compression và caching middleware cho tất cả các route
 app.use(cacheMiddleware(10));
 app.use(flash()); // use connect-flash for flash messages stored in session

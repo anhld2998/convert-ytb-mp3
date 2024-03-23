@@ -15,21 +15,15 @@ module.exports = function (app) {
     const outputDirectory = "./public/mp3";
     const protocol = req.protocol;
     const hostname = req.hostname || "localhost";
-    const localhostUrl = `${process.env.URL_LOCAL}/mp3/`;
-    const domainUrl =
-      hostname === "localhost"
-        ? localhostUrl
-        : `${protocol}://${hostname}/mp3/`;
+    const domainUrl = `${hostname === "localhost" ? process.env.URL_LOCAL : `${protocol}://${hostname}`}/mp3/`;
+    
     downloadAndConvertToMp3Middleware(youtubeUrl, outputDirectory, (result) => {
-      if (result.success) {
-        const filename = decodeURIComponent(result.fileName);
-        res.json({
-          success: true,
-          fileUrl: `${domainUrl}${filename}`,
-          filename,
-        });
+      const { success, fileName, error } = result;
+      if (success) {
+        const filename = decodeURIComponent(fileName);
+        res.json({ success: true, fileUrl: `${domainUrl}${filename}`, filename });
       } else {
-        res.json({ success: false, error: result.error });
+        res.json({ success: false, error });
       }
     });
   });

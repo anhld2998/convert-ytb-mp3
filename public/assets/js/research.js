@@ -135,37 +135,40 @@ function openModal(videoId, title) {
 
   // Make an AJAX request to your server to convert the video to MP3
   $.post("/convert-mp3", { youtubeUrl: videoId })
-    .done(function (data) {
-      if (data.success) {
-        const downloadLink = $("<a>")
-          .attr("href", data.fileUrl)
-          .attr("download", `${title}.mp3`)
-          .attr("target", "_blank")
-          .addClass("btn btn-sm btn-primary w-100")
-          .text("Download");
+  .done(function(data) {
+    if (data.success) {
+      const downloadLink = $("<a>")
+        .attr({
+          href: data.fileUrl,
+          download: `${title}.mp3`,
+          target: "_blank"
+        })
+        .addClass("btn btn-sm btn-primary w-100")
+        .text("Download");
 
-        const titleElement = $("<h5>").addClass("modal-title").text(title);
+      const titleElement = $("<h5>")
+        .addClass("modal-title")
+        .text(title);
 
-        const titleContainer = $("<div>")
-          .addClass("text-center title-container mt-2")
-          .append(titleElement);
+      const titleContainer = $("<div>")
+        .addClass("text-center title-container mt-2")
+        .append(titleElement);
 
-        modalBody.empty(); // Clear default content
+      modalBody.empty()
+        .append(titleContainer)
+        .append(downloadLink);
 
-        downloadLink.on("click", function () {
-          downloadLink.get(0).click(); // Trigger click event to initiate download
-        });
-
-        modalBody.append(titleContainer); // Add title container
-        modalBody.append(downloadLink); // Add download link
-      } else {
-        modalBody.html(`<p>Conversion failed: ${data.error}</p>`);
-      }
-    })
-    .fail(function (error) {
-      console.error("Error:", error);
-      modalBody.html("<p>An error occurred while converting the video.</p>");
-    });
+      downloadLink.on("click", function() {
+        // No need to trigger click event programmatically
+      });
+    } else {
+      modalBody.html(`<p>Conversion failed: ${data.error}</p>`);
+    }
+  })
+  .fail(function(error) {
+    console.error("Error:", error);
+    modalBody.html("<p>An error occurred while converting the video.</p>");
+  });
 }
 
 // Function to close modal
